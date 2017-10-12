@@ -61,11 +61,91 @@
                     It's a great language, and easier to learn. But it only goes halfway into systems programming success, where Rust can give you as much control as C, and has the added bonus of Generics
                   </section>
                 </section>
-				<section>Rust For your Brain</section>
+				<section>
+                    <section>Rust For your Brain</section>
                     <section>
-                      <br>
-				<section>Rust For your Computer</section>
-				<section>Rust For Justice</section>
+                      Explicit Mutability and borrow rules reduce need for unit tests
+                      <aside class="notes">
+                        The compiler can warn you when you've made something mutable that doesn't need to be.
+                      </aside>
+                    </section>
+                    <section>
+                      Strong typing also means not having to unit test as much.
+                      <aside class="notes">
+                        The compiler will error if you have passed the wrong object or tried to call methods /access attributes that don't exist.
+                      </aside>
+                    </section>
+                    <section>
+                      Trait system gives some of the dynamic language flexibility back
+                      <aside class="notes">
+                        Works a bit like C++ templates (UGHGGGG) but calling it traits helps you orient your brain toward what it is appropriate for vs. macros or other meta-programming techniques.
+                      </aside>
+                    </section>
+                    <section>
+                      <h3>"Fearless Concurrency" -- Go ahead and make a thread, we dare you</h3>
+                      <ul>
+                        <li>Explicit mutability makes it easy to find global mutation</li>
+                        <li>Built in Send/Sync traits for objects are useful for identify thread safe objects</li>
+                      </ul>
+                    </section>
+                    <section>
+                      You can opt out of these safeguards when you need to.
+                      <aside class="notes">
+                        unsafe is quite common deep within libraries where unit tests are worth the time to write. The key is that safety is the default, so most of the itime you can refactor the code without worrying about breaking things.
+                      </aside>
+                    </section>
+                    <section>
+                      Opt-in to garbage collection when you need flexible data ownership.
+                      <aside class="notes">
+                        It's incredible to be able to look at any section of code and know for sure if there is reference counted GC going on.
+                      </aside>
+                    </section>
+                </section>
+                <section>
+                  <section>Rust For Your Team</section>
+                  <section><h3>For your dev team...</h3>
+                    Programming languages aren't just for computers.<p/>
+                    Having explicit mutability and reference lifetimes helps be clear to humans too.
+                  </section>
+                  <section>
+                    English/Chinese/Spanish/Hindi/etc. are all terrible at representing abstract concepts succinctly and clearly. Say it with code!
+                  </section>
+                  <section><h3>For your ops team...</h3>
+                    Finding bugs at compile time means throwing better stuff over the wall to ops*.<p/>
+                    Using a system level language should usually mean better performance and smaller footprint too.
+                    <aside class="notes">
+                      * Be DevOps. The real DevOps, where Dev and Ops seek to understand eachother.
+                    </aside>
+                  </section>
+                  <section><h3>For your Dev & Ops...</h3>
+                    <ul>
+                      <li>How things get built and deploy matters. Ruby/Perl/Python packaging can be a nightmare.</li>
+                      <li>C/C++ have layers on layers of dependency hell even after existing for 30 years.</li>
+                    </ul>
+                  </section>
+                  <section><h3>New languages have better package/build/deploy stories.</h3>
+                    <ul>
+                      <li>Go has nice tie-ins with git and builds static binaries</li>
+                      <li>Rust's "Cargo" tool is extremely well thought out and well integrated with crates.io for easy code re-use.</li>
+                    </ul>
+                  </section>
+                </section>
+				<section>
+                  <section>Rust For Justice</section>
+                  <section>Firefox is a browser aimed at freedom and privacy, and its authors, Mozilla.org, invented Rust.</section>
+                  <section><h2>Firefox Quantum</h2> is the beta test of the next generation Firefox version.
+                    <ul>
+                      <li>HTML Rendering engine rewritten in Rust -- "Servo"</li>
+                      <li>CSS Rendering engine rewritten in Rust to be parallelized</li>
+                    </ul>
+                  </section>
+                  <section><h3>Why would they do that?</h3>
+                    <ul>
+                      <li>Firefox's original C++-bound memory model is basically why Google Chrome/Chromium exists.</li>
+                      <li>Rust authors experimented with the idea that less garbage collection and memory tied more concretely to scope would beat the Process memory model in the long run</li>
+                    </ul>
+                  </section>
+                </section>
 			</div>
 		</div>
 
