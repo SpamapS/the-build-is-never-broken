@@ -1,0 +1,33 @@
+* System level languages
+
+  * C and pointers were a revolution -- Finally a HIGH level language
+
+  * C++ -- Finally a language you had to be HIGH to appreciate
+
+  * C# -- Finally a language that goes half way to making system programming tolerable
+
+  * C++11 -- Finally a language worthy of both +'s
+
+  * ObjectiveC -- Like C, but without all that conjecture
+
+* Scripting Languages
+
+  * Bash -- I know computers are dumb but...
+
+  * Perl -- zomg wtf does that say?
+
+  * PHP -- zomg it does what in a function?
+
+  * Python -- whitespace ... bah
+
+  * Ruby -- Just.. put those statements wherever you think they look nicest
+
+  * node.js -- No really, servers can be unintelligible and poorly defined too
+
+* Rust for your brain
+
+  * Rust vs...
+
+    * C
+
+
