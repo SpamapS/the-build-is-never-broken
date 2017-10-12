@@ -25,9 +25,11 @@
 		<div class="reveal">
 			<div class="slides">
                 <section>
+                  <img src="images/rust.svg" style="float:right;width:80;height:80px;border:0"/>
                   <h1>Rust for your brain/team/justice.</h1>
-                  <h2>Clint Byrum - Cloud Software Engineer, GoDaddy</h2>
-                  <h6>Words are my own I do not speak for GoDaddy</h6>
+                  <h4>Clint Byrum -- @SpamapS on Freenode IRC and Twitter. <a href="http://fewbar.com/">http://fewbar.com/</a></h4>
+                  <h5>Cloud Software Engineer, GoDaddy</h5>
+                  <h6><i>Words are my own I do not speak for GoDaddy, Mozilla, or the Rust project.</i></h6>
                 </section>
                 <section>
                   <section>Programming Language Rant</section>
@@ -77,9 +79,78 @@
                     </section>
                     <section>
                       Trait system gives some of the dynamic language flexibility back
+                      <pre><code data-trim>
+                        use std::fmt;
+
+                        struct Bus {
+                            name: &'static str,
+                        }
+
+                        struct Train {
+                            line: &'static str,
+                        }
+
+                        struct Plane {
+                            callsign: &'static str,
+                        }
+
+                        impl fmt::Display for Bus {
+                            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                                write!(f, "{} bus", self.name)
+                            }
+                        }
+                        impl fmt::Display for Train {
+                            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                                write!(f, "{} train", self.line)
+                            }
+                        }
+                        impl fmt::Display for Plane {
+                            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+                                write!(f, "{} flight", self.callsign)
+                            }
+                        }
+
+                        fn main() {
+                            let b1 = Bus { name: "LAX Flyaway" };
+                            let t1 = Train { line: "Pacific Coastliner"};
+                            let p1 = Plane { callsign: "El Mariachi"};
+
+                            println!("I took the {} to the {} and then hopped on the {}.", b1, t1, p1); 
+                        }
+                      </code></pre>
                       <aside class="notes">
                         Works a bit like C++ templates (UGHGGGG) but calling it traits helps you orient your brain toward what it is appropriate for vs. macros or other meta-programming techniques.
                       </aside>
+                    </section>
+                    <section><h3>No easier in Python</h3>
+                      <pre><code>
+class Bus(object):
+    def __init__(self, name):
+       self.name = name 
+
+    def __str__(self):
+        return "%s bus" % (self.name,)
+
+class Train(object):
+    def __init__(self, line):
+       self.line = line 
+
+    def __str__(self):
+        return "%s train" % (self.line,)
+
+class Plane(object):
+    def __init__(self, callsign):
+       self.callsign = callsign 
+
+    def __str__(self):
+        return "%s plane" % (self.callsign,)
+
+b1 = Bus("LAX Flyaway")
+t1 = Train("Pacific Coastliner")
+p1 = Plane("El Mariachi")
+
+print("I took the {} to the {} and then hopped on the {}.".format(b1, t1, p1))
+                      </code></pre>
                     </section>
                     <section>
                       <h3>"Fearless Concurrency" -- Go ahead and make a thread, we dare you</h3>
@@ -90,12 +161,76 @@
                     </section>
                     <section>
                       You can opt out of these safeguards when you need to.
+                      <pre><code>
+use std::cell::RefCell;
+use std::thread;
+
+let result = thread::spawn(move || {
+   let c = RefCell::new(5);
+   let m = c.borrow_mut();
+
+   let b = c.borrow(); // this causes a panic
+}).join();
+
+assert!(result.is_err());
+                      </code></pre>
                       <aside class="notes">
                         unsafe is quite common deep within libraries where unit tests are worth the time to write. The key is that safety is the default, so most of the itime you can refactor the code without worrying about breaking things.
                       </aside>
                     </section>
                     <section>
                       Opt-in to garbage collection when you need flexible data ownership.
+                      <pre><code data-noescape>
+use std::rc::Rc;
+
+struct Owner {
+    name: String,
+    // ...other fields
+}
+
+struct Gadget {
+    id: i32,
+    owner: Rc<Owner>,
+    // ...other fields
+}
+
+fn main() {
+    // Create a reference-counted `Owner`.
+    let gadget_owner: Rc<Owner> = Rc::new(
+        Owner {
+            name: "Gadget Man".to_string(),
+        }
+    );
+
+    // Create `Gadget`s belonging to `gadget_owner`. Cloning the `Rc<Owner>`
+    // value gives us a new pointer to the same `Owner` value, incrementing
+    // the reference count in the process.
+    let gadget1 = Gadget {
+        id: 1,
+        owner: Rc::clone(&gadget_owner),
+    };
+    let gadget2 = Gadget {
+        id: 2,
+        owner: Rc::clone(&gadget_owner),
+    };
+
+    // Dispose of our local variable `gadget_owner`.
+    drop(gadget_owner);
+
+    // Despite dropping `gadget_owner`, we're still able to print out the name
+    // of the `Owner` of the `Gadget`s. This is because we've only dropped a
+    // single `Rc<Owner>`, not the `Owner` it points to. As long as there are
+    // other `Rc<Owner>` values pointing at the same `Owner`, it will remain
+    // allocated. The field projection `gadget1.owner.name` works because
+    // `Rc<Owner>` automatically dereferences to `Owner`.
+    println!("Gadget {} owned by {}", gadget1.id, gadget1.owner.name);
+    println!("Gadget {} owned by {}", gadget2.id, gadget2.owner.name);
+
+    // At the end of the function, `gadget1` and `gadget2` are destroyed, and
+    // with them the last counted references to our `Owner`. Gadget Man now
+    // gets destroyed as well.
+}
+                      </code></pre>
                       <aside class="notes">
                         It's incredible to be able to look at any section of code and know for sure if there is reference counted GC going on.
                       </aside>
@@ -106,14 +241,47 @@
                   <section><h3>For your dev team...</h3>
                     Programming languages aren't just for computers.<p/>
                     Having explicit mutability and reference lifetimes helps be clear to humans too.
+                    <pre><code class="python" data-trim>
+                    important = dict()  # Will this change? When? What goes in it?
+                    </code></pre>
+                    <pre><code class="rust" data-trim data-noescape>
+                    use std::collections::HashMap;
+
+                    let mut important: HashMap<String, Widgets> = HashMap::new();
+                    </code></pre>
                   </section>
                   <section>
                     English/Chinese/Spanish/Hindi/etc. are all terrible at representing abstract concepts succinctly and clearly. Say it with code!
                   </section>
                   <section><h3>For your ops team...</h3>
                     Finding bugs at compile time means throwing better stuff over the wall to ops*.<p/>
-                    Using a system level language should usually mean better performance and smaller footprint too.
+                    <pre><code>
+
+   Compiling borrowing v0.1.0 (file:///Users/cbyrum/src/SpamapS/presentation/borrowing)
+error[E0505]: cannot move out of `pyth` because it is borrowed
+  --> src/main.rs:20:30
+   |
+20 |     users.insert(&pyth.name, pyth);
+   |                   ---------  ^^^^ move out of `pyth` occurs here
+   |                   |
+   |                   borrow of `pyth.name` occurs here
+
+error[E0505]: cannot move out of `kant` because it is borrowed
+  --> src/main.rs:21:30
+   |
+21 |     users.insert(&kant.name, kant);
+   |                   ---------  ^^^^ move out of `kant` occurs here
+   |                   |
+   |                   borrow of `kant.name` occurs here
+
+error: aborting due to 2 previous errors
+
+error: Could not compile `borrowing`.
+
+To learn more, run the command again with --verbose.
+                    </code></pre>
                     <aside class="notes">
+                      Using a system level language should usually mean better performance and smaller footprint too.
                       * Be DevOps. The real DevOps, where Dev and Ops seek to understand eachother.
                     </aside>
                   </section>
@@ -123,17 +291,21 @@
                       <li>C/C++ have layers on layers of dependency hell even after existing for 30 years.</li>
                     </ul>
                   </section>
-                  <section><h3>New languages have better package/build/deploy stories.</h3>
+                  <section><h3>New langs, better package/build/deploy stories.</h3>
                     <ul>
                       <li>Go has nice tie-ins with git and builds static binaries</li>
                       <li>Rust's "Cargo" tool is extremely well thought out and well integrated with crates.io for easy code re-use.</li>
                     </ul>
+                    <a href="https://crates.io">https://crates.io/</a><p/>
+                    <img src="images/cargo.png"/>
                   </section>
                 </section>
 				<section>
                   <section>Rust For Justice</section>
-                  <section>Firefox is a browser aimed at freedom and privacy, and its authors, Mozilla.org, invented Rust.</section>
-                  <section><h2>Firefox Quantum</h2> is the beta test of the next generation Firefox version.
+                  <section>Firefox is aimed at freedom and privacy, and its authors, Mozilla.org, invented Rust.
+                    <img src="images/firefox-quantum.jpg" alt="Firefox Quantum" style="border:0">
+                  </section>
+                  <section><h2>Firefox Quantum</h2> - Beta test of the next generation Firefox version.
                     <ul>
                       <li>HTML Rendering engine rewritten in Rust -- "Servo"</li>
                       <li>CSS Rendering engine rewritten in Rust to be parallelized</li>
@@ -145,6 +317,10 @@
                       <li>Rust authors experimented with the idea that less garbage collection and memory tied more concretely to scope would beat the Process memory model in the long run</li>
                     </ul>
                   </section>
+                </section>
+                <section>
+                  THANK YOU<p/>
+                  Clint Byrum -- @SpamapS on Freenode IRC and Twitter. <a href="http://fewbar.com/">http://fewbar.com/</a>
                 </section>
 			</div>
 		</div>
