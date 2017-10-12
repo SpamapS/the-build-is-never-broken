@@ -7,7 +7,7 @@
 		<title>Rust for Justice</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/solarized.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -24,6 +24,43 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
+                <section>
+                  <h1>Rust for your brain/team/justice.</h1>
+                  <h2>Clint Byrum - Cloud Software Engineer, GoDaddy</h2>
+                  <h6>Words are my own I do not speak for GoDaddy</h6>
+                </section>
+                <section>
+                  <section>Programming Language Rant</section>
+                  <section><h3>Systems Languages</h3><p/>
+                    <ul>
+                      <li>C and pointers were a revolution - Finally a HIGH level language</li>
+                      <li>C++ -- HIGH level in that you need to be HIGH to appreciate it</li>
+                      <li>C# -- Oh clever another horizontal line -- and foreach</li>
+                      <li>C++11 -- Oh yeah we can have foreach too, but we still call it for.</li>
+                      <li>ObjectiveC -- All your user base are belong to iPhone.</li>
+                    </ul>
+                  </section>
+                  <section><h3>Systems Languages</h3><p/>
+                    Every single C descendent puts memory safety on the user.
+                  </section>
+                  <section><h3>Enter Memory Safe Languages</h3>
+                    Java*, Perl, PHP, Python, Ruby, node.js -- All do GC and take memory control away from programmer.<i><h6>*java still has pointers but doesn't do arthmetic on them</h6></i></section>
+                  <section><h3>GC languages can struggle with concurrency</h3>
+                    <ul>
+                      <li>Java VM pauses threads to GC objects.</li>
+                      <li>Python, Ruby, etc. have Global Interpreter Lock when executing Python code</li>
+                    </ul>
+                  </section>
+                  <section><h3>Shiny New Sytems Languages</h3><p/>
+                    <ul>
+                      <li>Go - Compiled duck-typed and syntax sugar for concurrency. Runs inside Go runtime with GC to avoid memory management.</li>
+                      <li>Rust - Compiled, strong-typed with generics. Explicit scoped memory management and object lifetimes expressed in language.</li>
+                    </ul>
+                  </section>
+                  <section><h3>Why not Go?</h3><p/>
+                    It's a great language, and easier to learn. But it only goes halfway into systems programming success, where Rust can give you as much control as C, and has the added bonus of Generics
+                  </section>
+                </section>
 				<section>Rust For your Brain</section>
                     <section>
                       <br>
