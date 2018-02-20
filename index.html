@@ -156,7 +156,8 @@ print("I took the {} to the {} and then hopped on the {}.".format(b1, t1, p1))
                       <h3>"Fearless Concurrency" -- Go ahead and make a thread, we dare you</h3>
                       <ul>
                         <li>Explicit mutability makes it easy to find global mutation</li>
-                        <li>Built in Send/Sync traits for objects are useful for identify thread safe objects</li>
+                        <li>Built in Send/Sync traits for objects allow compile time identification of thread safe objects</li>
+                        <li>Deadlock detection is still NP-complete. -- Hooray we get to keep our jobs</li>
                       </ul>
                     </section>
                     <section>
@@ -305,10 +306,11 @@ To learn more, run the command again with --verbose.
                   <section>Firefox is aimed at freedom and privacy, and its authors, Mozilla.org, invented Rust.
                     <img src="images/firefox-quantum.jpg" alt="Firefox Quantum" style="border:0">
                   </section>
-                  <section><h2>Firefox Quantum</h2> - Beta test of the next generation Firefox version.
+                  <section><h2>This Is <del>Unix</del> Rust, I KNOW THIS</h2>
                     <ul>
                       <li>HTML Rendering engine rewritten in Rust -- "Servo"</li>
                       <li>CSS Rendering engine rewritten in Rust to be parallelized</li>
+                      <li>Released in November -- super legit</li>
                     </ul>
                   </section>
                   <section><h3>Why would they do that?</h3>
