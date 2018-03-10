@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>Rust for Justice</title>
+		<title>Zuul - Crossing Your CI Streams</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/solarized.css">
@@ -25,48 +25,68 @@
 		<div class="reveal">
 			<div class="slides">
                 <section>
-                  <img src="images/rust.svg" style="float:right;width:80;height:80px;border:0"/>
-                  <h1>Rust for your brain/team/justice.</h1>
+                  <h1>Zuul - Crossing your CI Streams</h1>
                   <h4>Clint Byrum -- @SpamapS on Freenode IRC and Twitter. <a href="http://fewbar.com/">http://fewbar.com/</a></h4>
                   <h5>Cloud Software Engineer, GoDaddy</h5>
-                  <h6><i>Words are my own I do not speak for GoDaddy, Mozilla, or the Rust project.</i></h6>
+                  <h6><i>Words are my own I do not speak for GoDaddy or any project/foundation</i></h6>
                 </section>
                 <section>
-                  <section>Programming Language Rant</section>
-                  <section><h3>Systems Languages</h3><p/>
+                  <section>What's CI?</section>
+                  <section><h3>"Continuous Integration"</h3><p/>
                     <ul>
-                      <li>C and pointers were a revolution - Finally a HIGH level language</li>
-                      <li>C++ -- HIGH level in that you need to be HIGH to appreciate it</li>
-                      <li>C# -- Oh clever another horizontal line -- and foreach</li>
-                      <li>C++11 -- Oh yeah we can have foreach too, but we still call it for.</li>
-                      <li>ObjectiveC -- All your user base are belong to iPhone.</li>
+                      <li>Master* gets code ASAP</li>
+                      <li>Tests run to make sure Master/tip/HEAD/trunk isn't broken</li>
+                    </ul>
+                    <h6>* git is assumed -- sorry hg/svn/etc.</h6>
+                  </section>
+                  <section><h3>What are tests?</h3><p/>
+                    <ul>
+                      <li>Unit -- self contained -- "do my insides still work?"</li>
+                      <li>Functional -- mostly self contained -- "do my interfaces still work?"</li>
+                      <li>Integration -- externalized -- "do I still work the way you think I do?"</li>
                     </ul>
                   </section>
-                  <section><h3>Systems Languages</h3><p/>
-                    Every single C descendent puts memory safety on the user.
-                  </section>
-                  <section><h3>Enter Memory Safe Languages</h3>
-                    Java*, Perl, PHP, Python, Ruby, node.js -- All do GC and take memory control away from programmer.<i><h6>*java still has pointers but doesn't do arthmetic on them</h6></i></section>
-                  <section><h3>GC languages can struggle with concurrency</h3>
+                  <section><h3>When do you run them?</h3><p/>
                     <ul>
-                      <li>Java VM pauses threads to GC objects.</li>
-                      <li>Python, Ruby, etc. have Global Interpreter Lock when executing Python code</li>
+                      <li>Locally on my dev workstation/laptop in a tight loop</li>
+                      <li>Periodically from master/tip/HEAD/trunk</li>
+                      <li>On master/tip/HEAD/trunk + change in review aka "PR"</li>
                     </ul>
                   </section>
-                  <section><h3>Shiny New Systems Languages</h3><p/>
+                  <section><h3>Do you like it when they fail?</h3>
                     <ul>
-                      <li>Go - Compiled duck-typed and syntax sugar for concurrency. Runs inside Go runtime with GC to avoid memory management.</li>
-                      <li>Rust - Compiled, strong-typed with generics. Explicit scoped memory management and object lifetimes expressed in language.</li>
+                      <li>When you expect it -- yes!</li>
+                      <li>When you pull master and change nothing, not so much.</li>
                     </ul>
+                    <img src="images/badmerge.png"/>
                   </section>
-                  <section><h3>Why not Go?</h3><p/>
-                    It's a great language, and easier to learn. But it only goes halfway into systems programming success, where Rust can give you as much control as C, and has the added bonus of Generics
+                  <section><h3>Who broke the build?</h3>
+                    <ul>
+                      <li>Oh wait no, it was my change sorry</li>
+                      <li>No wait it was THEM</li>
+                    </ul>
+                    <img src="images/badmerge.png"/>
+                  </section>
+                  <section><h3>Nobody's fault</h3>
+                    <ul>
+                      <li>Reality changed between your PR and Merging it</li>
+                      <li>Nobody re-tests everything because zomg who has time?</li>
+                    </ul>
+                    <img src="images/forgot.png"/>
+                  </section>
+                  <section><h3>Gating Saves us</h3>
+                    <ul>
+                      <li>Test again before merge!</li>
+                      <li>Never merge broken tree</li>
+                      <li>Ergo, devs keep working and don't hate "THEM"</li>
+                    </ul>
+                    <img src="images/gatesave.png"/>
                   </section>
                 </section>
 				<section>
-                    <section>Rust For your Brain</section>
+                    <section>Zuul - The Gatekeeper</section>
                     <section>
-                      Explicit Mutability and borrow rules reduce need for unit tests
+                      
                       <aside class="notes">
                         The compiler can warn you when you've made something mutable that doesn't need to be.
                       </aside>
