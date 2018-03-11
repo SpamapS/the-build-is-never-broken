@@ -82,282 +82,155 @@
                     </ul>
                     <img src="images/gatesave.png"/>
                   </section>
+                  <section><h3>And that was just functional tests...</h3>
+                    <ul>
+                      <li>You probably have a ton of dependencies</li>
+                      <li>They're all going through the same thing!!</li>
+                    </ul>
+                    <img src="images/dependency.svg"/>
+                  </section>
                 </section>
 				<section>
                     <section>Zuul - The Gatekeeper</section>
                     <section>
-                      
-                      <aside class="notes">
-                        The compiler can warn you when you've made something mutable that doesn't need to be.
-                      </aside>
+                      Zuul Cross-repo project gating at a massive scale<p/>
+                      Wait, first, a story...
                     </section>
                     <section>
-                      Strong typing also means not having to unit test as much.
-                      <aside class="notes">
-                        The compiler will error if you have passed the wrong object or tried to call methods /access attributes that don't exist.
-                      </aside>
-                    </section>
-                    <section>
-                      Trait system gives some of the dynamic language flexibility back
-                      <pre><code data-trim>
-                        use std::fmt;
-
-                        struct Bus {
-                            name: &'static str,
-                        }
-
-                        struct Train {
-                            line: &'static str,
-                        }
-
-                        struct Plane {
-                            callsign: &'static str,
-                        }
-
-                        impl fmt::Display for Bus {
-                            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                                write!(f, "{} bus", self.name)
-                            }
-                        }
-                        impl fmt::Display for Train {
-                            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                                write!(f, "{} train", self.line)
-                            }
-                        }
-                        impl fmt::Display for Plane {
-                            fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                                write!(f, "{} flight", self.callsign)
-                            }
-                        }
-
-                        fn main() {
-                            let b1 = Bus { name: "LAX Flyaway" };
-                            let t1 = Train { line: "Pacific Coastliner"};
-                            let p1 = Plane { callsign: "El Mariachi"};
-
-                            println!("I took the {} to the {} and then hopped on the {}.", b1, t1, p1); 
-                        }
-                      </code></pre>
-                      <aside class="notes">
-                        Works a bit like C++ templates (UGHGGGG) but calling it traits helps you orient your brain toward what it is appropriate for vs. macros or other meta-programming techniques.
-                      </aside>
-                    </section>
-                    <section><h3>No easier in Python</h3>
-                      <pre><code>
-class Bus(object):
-    def __init__(self, name):
-       self.name = name 
-
-    def __str__(self):
-        return "%s bus" % (self.name,)
-
-class Train(object):
-    def __init__(self, line):
-       self.line = line 
-
-    def __str__(self):
-        return "%s train" % (self.line,)
-
-class Plane(object):
-    def __init__(self, callsign):
-       self.callsign = callsign 
-
-    def __str__(self):
-        return "%s plane" % (self.callsign,)
-
-b1 = Bus("LAX Flyaway")
-t1 = Train("Pacific Coastliner")
-p1 = Plane("El Mariachi")
-
-print("I took the {} to the {} and then hopped on the {}.".format(b1, t1, p1))
-                      </code></pre>
-                    </section>
-                    <section>
-                      <h3>"Fearless Concurrency" -- Go ahead and make a thread, we dare you</h3>
+                      <img src="images/openstack-logo.png" width="40%"/><p/>
+                      OpenStack Needed testing
                       <ul>
-                        <li>Explicit mutability makes it easy to find global mutation</li>
-                        <li>Built in Send/Sync traits for objects allow compile time identification of thread safe objects</li>
-                        <li>Deadlock detection is still NP-complete. -- Hooray we get to keep our jobs</li>
+                        <li>Large distributed system made of smaller pieces</li>
+                        <li>Functional testing is not enough -- each service is interdependent on others</li>
+                        <li>Zomg 900+ developers 40+ orgs all collaborating!</li>
                       </ul>
                     </section>
                     <section>
-                      You can opt out of these safeguards when you need to.
-                      <pre><code>
-use std::cell::RefCell;
-use std::thread;
-
-let result = thread::spawn(move || {
-   let c = RefCell::new(5);
-   let m = c.borrow_mut();
-
-   let b = c.borrow(); // this causes a panic
-}).join();
-
-assert!(result.is_err());
-                      </code></pre>
-                      <aside class="notes">
-                        unsafe is quite common deep within libraries where unit tests are worth the time to write. The key is that safety is the default, so most of the itime you can refactor the code without worrying about breaking things.
-                      </aside>
+                      <img src="images/openstack.png"/>
                     </section>
                     <section>
-                      Opt-in to garbage collection when you need flexible data ownership.
-                      <pre><code data-noescape>
-use std::rc::Rc;
-
-struct Owner {
-    name: String,
-    // ...other fields
-}
-
-struct Gadget {
-    id: i32,
-    owner: Rc<Owner>,
-    // ...other fields
-}
-
-fn main() {
-    // Create a reference-counted `Owner`.
-    let gadget_owner: Rc<Owner> = Rc::new(
-        Owner {
-            name: "Gadget Man".to_string(),
-        }
-    );
-
-    // Create `Gadget`s belonging to `gadget_owner`. Cloning the `Rc<Owner>`
-    // value gives us a new pointer to the same `Owner` value, incrementing
-    // the reference count in the process.
-    let gadget1 = Gadget {
-        id: 1,
-        owner: Rc::clone(&gadget_owner),
-    };
-    let gadget2 = Gadget {
-        id: 2,
-        owner: Rc::clone(&gadget_owner),
-    };
-
-    // Dispose of our local variable `gadget_owner`.
-    drop(gadget_owner);
-
-    // Despite dropping `gadget_owner`, we're still able to print out the name
-    // of the `Owner` of the `Gadget`s. This is because we've only dropped a
-    // single `Rc<Owner>`, not the `Owner` it points to. As long as there are
-    // other `Rc<Owner>` values pointing at the same `Owner`, it will remain
-    // allocated. The field projection `gadget1.owner.name` works because
-    // `Rc<Owner>` automatically dereferences to `Owner`.
-    println!("Gadget {} owned by {}", gadget1.id, gadget1.owner.name);
-    println!("Gadget {} owned by {}", gadget2.id, gadget2.owner.name);
-
-    // At the end of the function, `gadget1` and `gadget2` are destroyed, and
-    // with them the last counted references to our `Owner`. Gadget Man now
-    // gets destroyed as well.
-}
-                      </code></pre>
-                      <aside class="notes">
-                        It's incredible to be able to look at any section of code and know for sure if there is reference counted GC going on.
-                      </aside>
+                      <h3>Zuul was developed at this scale</h3>
+                      <ul>
+                        <li>1500+ active test nodes at once</li>
+                        <li>Jenkins was sad -- so we removed it</li>
+                        <li>Ansible offers a perfect distributed workflow system for running multi-node tests</li>
+                      </ul>
                     </section>
                 </section>
                 <section>
-                  <section>Rust For Your Team</section>
-                  <section><h3>For your dev team...</h3>
-                    Programming languages aren't just for computers.<p/>
-                    Having explicit mutability and reference lifetimes helps be clear to humans too.
-                    <pre><code class="python" data-trim>
-                    important = dict()  # Will this change? When? What goes in it?
-                    </code></pre>
-                    <pre><code class="rust" data-trim data-noescape>
-                    use std::collections::HashMap;
-
-                    let mut important: HashMap<String, Widgets> = HashMap::new();
-                    </code></pre>
+                  <section>
+                    <h3>Features that you can use</h3>
+                    <ul>
+                      <li>Gerrit and Github Code Review triggering/commenting/voting</li>
+                      <li>Git based configuration</li>
+                      <li>Speculative merging for high-velocity gating</li>
+                      <li>Custom image building/reuse (via Nodepool)</li>
+                      <li>Multi-Region/Multi-Cloud (via Nodepool)</li>
+                      <li>Easy multi-node testing</li>
+                      <li>Massively Scalable</li>
+                      <li>Cross-repo and Cross-source speculative merge gating</li>
+                    </ul>
                   </section>
                   <section>
-                    English/Chinese/Spanish/Hindi/etc. are all terrible at representing abstract concepts succinctly and clearly. Say it with code!
+                    <h3>Gerrit and Github</h3>
+                    <ul>
+                      <li>Gerrit -- Apache licensed code review tool used for big projects like OpenStack and Android</li>
+                      <li>Github -- Proprietary website and on-premises "Enterprise" code-review/hosting system</li>
+                      <li>Install OpenStack Zuul app on your github repo</li>
+                    </ul>
                   </section>
-                  <section><h3>For your ops team...</h3>
-                    Finding bugs at compile time means throwing better stuff over the wall to ops*.<p/>
-                    <pre><code>
-
-   Compiling borrowing v0.1.0 (file:///Users/cbyrum/src/SpamapS/presentation/borrowing)
-error[E0505]: cannot move out of `pyth` because it is borrowed
-  --> src/main.rs:20:30
-   |
-20 |     users.insert(&pyth.name, pyth);
-   |                   ---------  ^^^^ move out of `pyth` occurs here
-   |                   |
-   |                   borrow of `pyth.name` occurs here
-
-error[E0505]: cannot move out of `kant` because it is borrowed
-  --> src/main.rs:21:30
-   |
-21 |     users.insert(&kant.name, kant);
-   |                   ---------  ^^^^ move out of `kant` occurs here
-   |                   |
-   |                   borrow of `kant.name` occurs here
-
-error: aborting due to 2 previous errors
-
-error: Could not compile `borrowing`.
-
-To learn more, run the command again with --verbose.
+                  <section>
+                    <h3>Ansible Collaborating with OpenStack via Zuul</h3>
+                    PR's to Ansible's OpenStack modules are tested via Zuul
+                    <img src="images/ansible-github.png"/>
+                    <a href="https://github.com/ansible/ansible/pull/37170">https://github.com/ansible/ansible/pull/37170</a>
+                  </section>
+                  <section>
+                    <h3>YAML config in-repo or centralized defines config</h3>
+                    <pre><code class="yaml data-trim">
+- project:
+    name: ansible/ansible
+    third-party-check:
+      jobs:
+        - shade-ansible-devel-functional-devstack:
+            files:
+              - ^lib/ansible/modules/cloud/openstack/.*
+              - ^contrib/inventory/openstack.py
+              - ^lib/ansible/plugins/inventory/openstack.py
+              - ^lib/ansible/module_utils/openstack.py
+              - ^lib/ansible/utils/module_docs_fragments/openstack.py
                     </code></pre>
-                    <aside class="notes">
-                      Using a system level language should usually mean better performance and smaller footprint too.
-                      * Be DevOps. The real DevOps, where Dev and Ops seek to understand eachother.
-                    </aside>
                   </section>
-                  <section><h3>For your Dev & Ops...</h3>
+                  <section><h3>Speculative merging for high velocity merging</h3>
+                    [ switch to other presentation ]
+                  </section>
+                  <section><h3>Custom Image Building/Multi-Cloud</h3>
                     <ul>
-                      <li>How things get built and deploy matters. Ruby/Perl/Python packaging can be a nightmare.</li>
-                      <li>C/C++ have layers on layers of dependency hell even after existing for 30 years.</li>
+                      <li>Pre-cache all those downloads</li>
+                      <li>Nodepool manages image uploads and refreshes periodically</li>
+                      <li>Uses diskimage-builder -- whole other talk</li>
+                      <li>Multi-Cloud -- as long as they're all OpenStack clouds (over 20 public OpenStacks globally)</li>
+                      <li>AWS, Kubernetes, and other resource drivers are available but un-merged</li>
                     </ul>
                   </section>
-                  <section><h3>For your Dev & Ops....</h3>
-                    Who is eating up all my RAM?
-                    <img src="images/top.png"/>
+                  <section><h3>Easy Multi-Node testing</h3>
+                    <pre><code class="yaml" data-trim>
+- job:
+    parent: base
+    name: test-kolla-ansible
+    run: kolla_ansible/main.yml
+    nodeset:
+        nodes:
+            - name: meta-api
+              label: kolla-centos7
+            - name: cell-api
+              label: kolla-centos7
+            - name: db
+              label: kolla-centos7
+            - name: mq
+              label: kolla-centos7
+            - name: hypervisor
+              label: kolla-centos7
+</pre></code>
                   </section>
-                  <section><h3>For your Dev & Ops....</h3>
-                    Nodepool? Call nodepool team. Zuul? Call zuul team. Wait.. JAVA?! ALWAYS JAVA
-                    <img src="images/top.png"/>
+                  <section><h3>Easy Multi-Node testing</h3>
+                    <pre><code class="yaml" data-trim>
+- name: "Setup docker on servers that will need it."
+  hosts: cap,map,hv
+  roles:
+    - docker
+
+- name: "Setup database on db server."
+  hosts: db
+  roles:
+    - db
+
+- name: "Setup rabbit on mq server."
+  hosts: mq
+  roles:
+    - mq
+</pre></code>
                   </section>
-                  <section><h3>For your Dev & Ops....</h3>
-                    Runtimes matter
-                    <img src="images/top.png"/>
-                    <aside class="notes">
-                      Languages like java that have a standard runtime have
-                      knobs for ops. This shifts responsibility over to ops
-                      team for memory management.  These knobs are only
-                      moderately effective and the context with which they
-                      should be turned is confusing.  A systems language like C
-                      or Rust requires developers to create context-sensitive
-                      knobs like 'innodb_buffer_pool_size', or better yet,
-                      requires them to manage their own memory effectively.
+                  <section><h3>Massively Scalable</h3>
+                    <img src="images/zuul-arch.svg" height="60%"/>
                   </section>
-                  <section><h3>New langs, better package/build/deploy stories.</h3>
-                    <ul>
-                      <li>Go has nice tie-ins with git and builds static binaries</li>
-                      <li>Rust's "Cargo" tool is extremely well thought out and well integrated with crates.io for easy code re-use.</li>
-                    </ul>
-                    <a href="https://crates.io">https://crates.io/</a><p/>
-                    <img src="images/cargo.png"/>
+                  <section><h3>Cross-Repo Dependency Controls</h3>
+					<ul>
+                      <li>Make one change depend on another</li>
+                      <li>Build speculative cross-repo change-set <b>and test it without merging it</b></li>
+                      <li>Allows devs to "fire and forget" on a PR, it won't merge until it will actually work!</li>
+                      <li>Struggles with circular deps, you must unroll to use the feature</li>
+			        </ul>	
                   </section>
                 </section>
 				<section>
-                  <section>Rust For Justice</section>
-                  <section>Firefox is aimed at freedom and privacy, and its authors, Mozilla.org, invented Rust.
-                    <img src="images/firefox-quantum.jpg" alt="Firefox Quantum" style="border:0">
-                  </section>
-                  <section><h2>This Is <del>Unix</del> Rust, I KNOW THIS</h2>
+                  <section>How can I try it?
                     <ul>
-                      <li>HTML Rendering engine rewritten in Rust -- "Servo"</li>
-                      <li>CSS Rendering engine rewritten in Rust to be parallelized</li>
-                      <li>Released in November -- super legit</li>
-                    </ul>
-                  </section>
-                  <section><h3>Why would they do that?</h3>
-                    <ul>
-                      <li>Firefox's original C++-bound memory model is basically why Google Chrome/Chromium exists.</li>
-                      <li>Rust authors experimented with the idea that less garbage collection and memory tied more concretely to scope would beat the Process memory model in the long run</li>
+                      <li>Wait for v3.0 release VERY soon -- next week? Maybe</li>
+                      <li>... or you can use it from master like we do at GoDaddy (and other users). Caveat Emptor</li>
+                      <li>git clone https://git.openstack.org/openstack-infra/zuul/</li>
+                      <li>#zuul on Freenode IRC</li>
+                      <li>https://zuul-ci.org/ -- Mailing lists here!</li>
                     </ul>
                   </section>
                 </section>
