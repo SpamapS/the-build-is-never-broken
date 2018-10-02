@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>Zuul - Crossing Your CI Streams</title>
+        <title>AnsibleFest 2018 - The Build is Never Broken</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/solarized.css">
@@ -31,7 +31,31 @@
                   <h6><i>Words are my own I do not speak for GoDaddy or any project/foundation</i></h6>
                 </section>
                 <section>
-                  <section>GoDaddy, circa. 2 B.C. (Before Clint)</section>
+                  <section>
+                    <h3>My Ansible Story</h3>
+                    <ul>
+                      <li><i>How did you get started with Ansible?</i> -- Reluctantly at first</li>
+                      <li><i>How long have you been using it?</i> -- First tool in toolbox since 2014</li>
+                      <li><i>What's your favorite thing to do when you Ansible?</i> -- Think in Workflow rather than Modeling</li>
+                    </ul>
+                    </p>
+                    #AnsibleFest
+                  </section>
+                </section>
+                <section>
+                  <section>
+                    <h3>Ok but, what is it that you do here?</h3>
+                    <ul>
+                      <li>Deploy and operate OpenStack across 4700+ hypervisors(587TB of RAM, 112,000 cores)</li>
+                      <li>4 regions (US west, US east, Singapore, Amsterdam)</li>
+                      <li>OpenStack runs production and dev for many GoDaddy.com components</li>
+                      <li>OpenStack also at core of some GoDaddy hosting products</li>
+                    </ul>
+                  </section>
+                  <section>
+                    GoDaddy, circa. 2 B.C. (Before Clint)</p>
+                    <img src="images/caveman.jpg"/>
+                  </section>
                   <section><h3>OpenStack deployed with RPMs and puppet</h3><p/>
                     <ul>
                       <li>Custom patches applied to OpenStack via RPM</li>
@@ -44,38 +68,45 @@
                   <section><h3>What was broken?</h3><p/>
                     <h4>Custom patches applied to OpenStack via RPM</h4>
                     <ul>
-                      <li>RPM build process was black magic</li>
+                      <li>RPM build process was dark magic</li>
                       <li>Patches made every upgrade a massive merge fight</li>
-                      <li>Lack of dynamic environment to test in meant slow progress</li>
+                      <li><div style="font-size:90%">Lack of dynamic test environment meant slow progress</div></li>
                     </ul>
                   </section>
                   <section><h3>What was broken?</h3><p/>
                     <h4>Hieradata packaged into RPMs</h4>
                     <ul>
                       <li>SECURITY! -- Sensitive things crept into RPMs which anyone behind FW could download!</li>
-                      <li>Lack of dynamic environment for tests in meant slow progress</li>
+                      <li><div style="font-size:100%">Lack of dynamic test environment meant slow progress</div></li>
                     </ul>
                   </section>
                   <section><h3>What was broken?</h3><p/>
                     <h4>CI limited to static analysis tests</h4>
                     <ul>
                       <li>Jenkins is a glorious, magnificent beast -- Easy to feed, hard to tame</li>
-                      <li>Lack of dynamic environment to test in meant slow progress</li>
+                      <li>Entirely missed simple things like "does the REST API actually work?"</li>
+                      <li><div style="font-size:130%">Lack of dynamic test environment meant slow progress</div></li>
                     </ul>
                   </section>
                   <section><h3>What was broken?</h3><p/>
                     <h4>Masterless puppet triggered by RPM+Ansible</h4>
                     <ul>
-                      <li>Almost nothing! Great solution to scale puppet</li>
-                      <li>Lack of dynamic environment to test in meant slow progress</li>
+                      <li>Almost nothing! Great solution to scale puppet without rewriting</li>
+                      <li><div style="font-size:180%">Lack of dynamic test environment meant slow progress</div></li>
                     </ul>
                   </section>
                   <section><h3>What was broken?</h3><p/>
                     <h4>Static dev/test/stage environments</h4>
                     <ul>
-                      <li>Lack of dynamic environment to test in meant slow progress!</li>
-                      <li>Master was never known to be working -- good luck developing on broken code!</li>
-                      <li>Changes in-flight would block urgent fixes from landing in master, encouraging one-off ad-hoc runtime Ansible/Puppet runs</li>
+                      <li>Lack of dynamic test environment meant slow progress!</li>
+                      <li>Master never known to be working</li>
+                      <li>Changes in-flight would either
+                        <ul>
+                          <li>block urgent fixes from landing</li>
+                          <li>accidentally go live</li>
+                          <li>force ad-hoc improvisation in production</li>
+                        </ul>
+                      </li>
                     </ul>
                   </section>
                 </section>
@@ -83,20 +114,22 @@
                   <section>A few solutions</section>
                   <section>
                     <ul>
-                      <li>Write a patch as best you can.</li>
+                      <li>Write a Patch as best you can.</li>
                       <li>Get it through review</li>
-                      <li>deploy artifacts in static dev environment.</li>
-                      <li>Repeate as necessary</li>
+                      <li>Deploy artifacts in static dev environment</li>
+                      <li>Test and Repeat as necessary</li>
                     </ul>
                   </section>
                   <section>
+                    <img src="images/madmax.jpg" alt="Mad max blowing gas in to engine"/></p>
                     <ul>
                       <li>Live-edit static dev environment</li>
                       <li>Try to remember everything you editted, put that in a patch</li>
-                      <li>From here it is actually the same as previous process.. patch, review, deploy, iterate</li>
+                      <li>Start Previous process with a little more confidence</li>
                     </ul>
                   </section>
                   <section>
+                    <a href="https://www.flickr.com/photos/pnglife/2827270584/in/photolist-6N7efX-4nY5TU-n7cmgE-cYzgLE-n7bcve-fx6zzJ-e4PDAE-n7aEo6-m7Jqw9-BWrQf-tM3afc-neQRE4-8E5SX2-dUijCs-3K3RwJ-naVVhZ-8DkD4f-8j9fuA-F66wwC-5iQv3y-Ho3YY-pw35G-5x5Jqe-5xL4jf-q2i6SL-5wTqvT-6LY2Xa-wYaPG-qSUxYz-cGUGHQ-9K5miw-cjNEvw-7K1v4y-5U7abN-nb4bHo-3LeqUZ-MDBcC-pLY3vv-ehnma-7pncnQ-yrKMiu-uAWk3-89eyng-3Eajgn-7U1mXN-bxeo83-7SinCu-6pSqFe-rrcswJ" title="Goat herders"><img src="https://farm4.staticflickr.com/3032/2827270584_b3ace39b0e_b.jpg" height="300px" alt="Goat herders"></a>
                     <ul>
                       <li>take ball</li>
                       <li>go home</li>
@@ -104,24 +137,31 @@
                     </ul>
                   </section>
                   <section>
-                    But what about Vagrant?
+                    But what about Vagrant?<p/>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Vagrant.png/300px-Vagrant.png" border=0 />
                   </section>
                   <section>
+                    <img src="https://imgs.xkcd.com/comics/standards.png"/><p/>
                     Making a special dev harness means now you have two ways to deploy your code.
                   </section>
                   <section>
-                    <h3>Jenkins for great justice?</h3>
+                    <h3>Jenkins for great justice?</h3><p/>
+                    <img src="images/jenkins-logo.png" height="200px"><p/>
                     <ul>
-                      <li>Team had some resources for Jenkins automation</li>
-                      <li>However Jenkins cannot gate efficiently, so build was disjoint and sometimes broken</li>
+                      <li>Team has a ton of Jenkins automation, most is post-merge</li>
+                      <li>No gating means people can ignore it</li>
                       <li>Also nobody on the team really knows Groovy</li>
                     </ul>
                   </section>
                 </section>
                 <section>
-                  <section><h3>Zuul - The Gatekeeper</h3></section>
+                  <section>
+                    <h3>Zuul - The Gatekeeper</h3><p/>
+                    <img src="images/gatekeeper.png" height="300px">
+                  </section>
                   <section>
                     Zuul is, among other things, Cross-repo project gating at a massive scale<p/>
+                    <img src="images/crossingstreams.jpg"/>
                   </section>
                   <section>
                     <img src="images/openstack-logo.png" width="40%"/><p/>
@@ -154,14 +194,7 @@
                       <li>Easy multi-node testing</li>
                       <li>Massively Scalable</li>
                       <li>Cross-repo and Cross-source speculative merge gating</li>
-                    </ul>
-                  </section>
-                  <section>
-                    <h3>Gerrit and Github</h3>
-                    <ul>
-                      <li>Gerrit -- Apache licensed code review tool used for big projects like OpenStack and Android</li>
-                      <li>Github -- Proprietary website and on-premises "Enterprise" code-review/hosting system</li>
-                      <li>Install OpenStack Zuul app on your github repo</li>
+                      <li>In-repo secret encryption</li>
                     </ul>
                   </section>
                   <section>
@@ -221,6 +254,10 @@
                   <section>
                     <img src="images/zuul-arch.svg" height="35%"/>
                   </section>
+                  <section>
+                    <h3>That's right, it's Webscale</h3><p/>
+                    <img src="images/webscale.jpg" height="35%"/>
+                  </section>
                   <section><h3>Cross-Repo Dependency Controls</h3>
 					<ul>
                       <li>Make one change depend on another</li>
@@ -231,55 +268,82 @@
                   </section>
                 </section>
                 <section>
-                  <section>But how does GoDaddy use it?</section>
+                  <section>But how does<img src="images/godaddy_logo.png" alt="GoDaddy" height="100px"/> use <img src="images/zuul.svg" alt="Zuul" height="100px"/>?</section>
                   <section>
+                    <h3>How does GoDaddy use Zuul?</h3>
                     <ul>
-                      <li>Strive to express every change as a git commit</li>
-                      <li>Only deploy changes that have at least been throug a Zuul test</li>
-                      <li>Define jobs that test the components in isolation and end-to-end</li>
-                      <li>Ask forgiveness, not permission...</li>
+                      <li>New OpenStack deployment/management</li>
+                      <li>Legacy Kubernetes (wow, that was fast..)</li>
+                      <li><div style="font-size:30px;font-family:monospace">At 0957 Nobember 16 2017 Zuul became self aware<img src="images/terminator.png" height="30px" style="border-bottom-style:none;border-left-style:none;border-top-style:none;border-right-style:none"/></div></li>
                     </ul>
                   </section>
                   <section>
-                    <h3>GoDaddy has some synergy with Zuul that helps too</h3>
+                    <ul>
+                      <li>95% of changes are expressed as changes to 1 repo, as 1 of 3 things: Config, Topology, or rendering of Config+Topology</li>
+                      <li>Topology is the model by which we relate services, servers, and configuration</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h3>When an engineer opens or approves a PR...</h3>
+                    <ul>
+                      <li>Nodepool allocates VMs in cloud</li>
+                      <li>Zuul builds an Ansible inventory with those VMs</li>
+                      <li>Zuul job creates a "fake" topology with the nodeset given, and renders it in to the needed Ansible inventory and variables for every job run</li>
+                      <li>Jobs are given limited creds for external services</li>
+                      <li>Job results are reported back via PR/github API</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <img src="images/ansibledawg.jpg" alt="Yo dawg, I heard you like Ansible, so I wrote a playbook to run your playbook"/></p>
+                    <b>Zuulception</b> <i>n.</i> Running Ansible with Zuul to test that your Zuul deploys with the Ansible that deploys Zuul.
+                  </section>
+                  <section>
+                    <h3>Rigor Matters</h3>
+                    <ul>
+                      <li>Strive to express every change as a git commit</li>
+                      <li>Only deploy changes that have at least been through a Zuul test</li>
+                      <li>Define jobs that test the components both in isolation and end-to-end</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h3>GoDaddy has some advantages</h3>
                     <ul>
                       <li>GitHub Enterprise for change tracking already in place</li>
-                      <li>Over 2000 hypervisors worth of OpenStack private cloud spread across 4 regions</li>
-                      <li>OpenStack Engineering (AKA Cloud Automation) team at GoDaddy already was transitioning to Ansible</li>
+                      <li>Over 2000 hypervisors in OpenStack private cloud spread across 4 regions</li>
+                      <li>OpenStack Engineering team at GoDaddy already was transitioning to Ansible</li>
                       <li>Helps to have a Zuul core dev on staff</li>
                     </ul>
                   </section>
                   <section>
-                    <h3>Ok but, what is it, that you do here?</h3>
-                    <ul>
-                      <li>95% of changes are expressed as changes to 1 repo, as 1 of 3 things: Config, Topology, or rendering of Config+Topology</li>
-                      <li>Topology is the model by which we relate services, servers, and configuration</li>
-                      <li>Zuul job creates a "fake" topology with the nodeset given, and renders it in to the needed Ansible inventory and variables for every job run</li>
-                      <li>Each job is given access to a limited service account that lets it talk to services outside of OpenStack team's control</li>
-                    </ul>
-                  </section>
-                  <section>
-                    <h3>No problems, everything is fine</h3>
+                    <img src="images/thisisfine.png" height="150px" alt="This (everything on fire) is fine"/></p>
                     <ul>
                       <li>Deploying a mini-cloud on 5 VMs and running a slew of functional tests on it is slow - 55 minutes</li>
-                      <li>When Zuul breaks, team isn't invested enough to fix it</li>
+                      <li>Zuul is still new, team struggles to fix it</li>
                       <li>Zuul's scale makes deployment complicated</li>
                       <li>Auto-Hold system is clunky for users, as it was designed with Zuul-admins in mind</li>
                     </ul>
                   </section>
+                  <section>
+                    <h3>How's it going?</h3>
+                    <ul>
+                      <li>Team morale improved greatly</li>
+                      <li>Velocity and quality remain high</li>
+                      <li>Team spends more time designing and automating, less time testing</li>
+                    </ul>
+                  </section>
                 </section>
 				<section>
-                  <section>How can I try it?
+                  <section><h3>How can I try it?</h3>
                     <ul>
-                      <li>Wait for v3.0 release VERY soon -- next week? Maybe</li>
-                      <li>... or you can use it from master like we do at GoDaddy (and other users). Caveat Emptor</li>
-                      <li>git clone https://git.openstack.org/openstack-infra/zuul/</li>
+                      <li><a href="https://zuul-ci.org/">https://zuul-ci.org/</a> -- Docs and Mailing lists here!</li>
+                      <li>Come talk to us at the booth!</li>
+                      <li>This room, 3:00pm, Paul Belanger and Ricardo Carillo Cruz have more Zuul!</li>
                       <li>#zuul on Freenode IRC</li>
-                      <li>https://zuul-ci.org/ -- Mailing lists here!</li>
                     </ul>
                   </section>
                 </section>
                 <section>
+                  <img src="images/staypuft.jpg" height="300px"/><p/>
                   THANK YOU<p/>
                   Clint Byrum -- @SpamapS on Freenode IRC and Twitter. <a href="http://fewbar.com/">http://fewbar.com/</a>
                 </section>
