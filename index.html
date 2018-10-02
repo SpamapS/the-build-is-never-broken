@@ -25,99 +25,124 @@
 		<div class="reveal">
 			<div class="slides">
                 <section>
-                  <h1>Zuul - Crossing your CI Streams</h1>
+                  <h1>The Build is Never Broken</h1>
                   <h4>Clint Byrum -- @SpamapS on Freenode IRC and Twitter. <a href="http://fewbar.com/">http://fewbar.com/</a></h4>
-                  <h5>Cloud Software Engineer, GoDaddy</h5>
+                  <h5>Engineering Manager / Software Dev Eng V, GoDaddy</h5>
                   <h6><i>Words are my own I do not speak for GoDaddy or any project/foundation</i></h6>
                 </section>
                 <section>
-                  <section>What's CI?</section>
-                  <section><h3>"Continuous Integration"</h3><p/>
+                  <section>GoDaddy, circa. 2 B.C. (Before Clint)</section>
+                  <section><h3>OpenStack deployed with RPMs and puppet</h3><p/>
                     <ul>
-                      <li>Master* gets code ASAP</li>
-                      <li>Tests run to make sure Master/tip/HEAD/trunk isn't broken</li>
-                    </ul>
-                    <h6>* git is assumed -- sorry hg/svn/etc.</h6>
-                  </section>
-                  <section><h3>What are tests?</h3><p/>
-                    <ul>
-                      <li>Unit -- self contained -- "do my insides still work?"</li>
-                      <li>Functional -- mostly self contained -- "do my interfaces still work?"</li>
-                      <li>Integration -- externalized -- "do I still work the way you think I do?"</li>
+                      <li>Custom patches applied to OpenStack via RPM</li>
+                      <li>Hieradata packaged into RPMs</li>
+                      <li>CI limited to static analysis tests</li>
+                      <li>Masterless puppet triggered by RPM+Ansible</li>
+                      <li>Static dev/test/stage environments</li>
                     </ul>
                   </section>
-                  <section><h3>When do you run them?</h3><p/>
+                  <section><h3>What was broken?</h3><p/>
+                    <h4>Custom patches applied to OpenStack via RPM</h4>
                     <ul>
-                      <li>Locally on my dev workstation/laptop in a tight loop</li>
-                      <li>Periodically from master/tip/HEAD/trunk</li>
-                      <li>On master/tip/HEAD/trunk + change in review aka "PR"</li>
+                      <li>RPM build process was black magic</li>
+                      <li>Patches made every upgrade a massive merge fight</li>
+                      <li>Lack of dynamic environment to test in meant slow progress</li>
                     </ul>
                   </section>
-                  <section><h3>Do you like it when they fail?</h3>
+                  <section><h3>What was broken?</h3><p/>
+                    <h4>Hieradata packaged into RPMs</h4>
                     <ul>
-                      <li>When you expect it -- yes!</li>
-                      <li>When you pull master and change nothing, not so much.</li>
+                      <li>SECURITY! -- Sensitive things crept into RPMs which anyone behind FW could download!</li>
+                      <li>Lack of dynamic environment for tests in meant slow progress</li>
                     </ul>
-                    <img src="images/badmerge.png"/>
                   </section>
-                  <section><h3>Who broke the build?</h3>
+                  <section><h3>What was broken?</h3><p/>
+                    <h4>CI limited to static analysis tests</h4>
                     <ul>
-                      <li>Oh wait no, it was my change sorry</li>
-                      <li>No wait it was THEM</li>
+                      <li>Jenkins is a glorious, magnificent beast -- Easy to feed, hard to tame</li>
+                      <li>Lack of dynamic environment to test in meant slow progress</li>
                     </ul>
-                    <img src="images/badmerge.png"/>
                   </section>
-                  <section><h3>Nobody's fault</h3>
+                  <section><h3>What was broken?</h3><p/>
+                    <h4>Masterless puppet triggered by RPM+Ansible</h4>
                     <ul>
-                      <li>Reality changed between your PR and Merging it</li>
-                      <li>Nobody re-tests everything because zomg who has time?</li>
+                      <li>Almost nothing! Great solution to scale puppet</li>
+                      <li>Lack of dynamic environment to test in meant slow progress</li>
                     </ul>
-                    <img src="images/forgot.png"/>
                   </section>
-                  <section><h3>Gating Saves us</h3>
+                  <section><h3>What was broken?</h3><p/>
+                    <h4>Static dev/test/stage environments</h4>
                     <ul>
-                      <li>Test again before merge!</li>
-                      <li>Never merge broken tree</li>
-                      <li>Ergo, devs keep working and don't hate "THEM"</li>
+                      <li>Lack of dynamic environment to test in meant slow progress!</li>
+                      <li>Master was never known to be working -- good luck developing on broken code!</li>
+                      <li>Changes in-flight would block urgent fixes from landing in master, encouraging one-off ad-hoc runtime Ansible/Puppet runs</li>
                     </ul>
-                    <img src="images/gatesave.png"/>
-                  </section>
-                  <section><h3>And that was just functional tests...</h3>
-                    <ul>
-                      <li>You probably have a ton of dependencies</li>
-                      <li>They're all going through the same thing!!</li>
-                    </ul>
-                    <img src="images/dependency.svg"/>
                   </section>
                 </section>
 				<section>
-                    <section>Zuul - The Gatekeeper</section>
-                    <section>
-                      Zuul Cross-repo project gating at a massive scale<p/>
-                      Wait, first, a story...
-                    </section>
-                    <section>
-                      <img src="images/openstack-logo.png" width="40%"/><p/>
-                      OpenStack Needed testing
-                      <ul>
-                        <li>Large distributed system made of smaller pieces</li>
-                        <li>Functional testing is not enough -- each service is interdependent on others</li>
-                        <li>Zomg 900+ developers 40+ orgs all collaborating!</li>
-                      </ul>
-                    </section>
-                    <section>
-                      <img src="images/openstack.png"/>
-                    </section>
-                    <section>
-                      <h3>Zuul was developed at this scale</h3>
-                      <ul>
-                        <li>1500+ active test nodes at once</li>
-                        <li>Jenkins was sad -- so we removed it</li>
-                        <li>Ansible offers a perfect distributed workflow system for running multi-node tests</li>
-                      </ul>
-                    </section>
+                  <section>A few solutions</section>
+                  <section>
+                    <ul>
+                      <li>Write a patch as best you can.</li>
+                      <li>Get it through review</li>
+                      <li>deploy artifacts in static dev environment.</li>
+                      <li>Repeate as necessary</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <ul>
+                      <li>Live-edit static dev environment</li>
+                      <li>Try to remember everything you editted, put that in a patch</li>
+                      <li>From here it is actually the same as previous process.. patch, review, deploy, iterate</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <ul>
+                      <li>take ball</li>
+                      <li>go home</li>
+                      <li>look up "how to become a goat herder" on the internet</li>
+                    </ul>
+                  </section>
+                  <section>
+                    But what about Vagrant?
+                  </section>
+                  <section>
+                    Making a special dev harness means now you have two ways to deploy your code.
+                  </section>
+                  <section>
+                    <h3>Jenkins for great justice?</h3>
+                    <ul>
+                      <li>Team had some resources for Jenkins automation</li>
+                      <li>However Jenkins cannot gate efficiently, so build was disjoint and sometimes broken</li>
+                      <li>Also nobody on the team really knows Groovy</li>
+                    </ul>
+                  </section>
                 </section>
                 <section>
+                  <section><h3>Zuul - The Gatekeeper</h3></section>
+                  <section>
+                    Zuul is, among other things, Cross-repo project gating at a massive scale<p/>
+                  </section>
+                  <section>
+                    <img src="images/openstack-logo.png" width="40%"/><p/>
+                    OpenStack Needed testing
+                    <ul>
+                      <li>Large distributed system made of smaller pieces</li>
+                      <li>Functional testing is not enough -- each service is interdependent on others</li>
+                      <li>Zomg 900+ developers 40+ orgs all collaborating!</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <img src="images/openstack.png"/>
+                  </section>
+                  <section>
+                    <h3>Zuul was developed at this scale</h3>
+                    <ul>
+                      <li>1500+ active test nodes at once</li>
+                      <li>Jenkins was sad -- so we removed it</li>
+                      <li>Ansible offers a perfect distributed workflow system for running multi-node tests</li>
+                    </ul>
+                  </section>
                   <section>
                     <h3>Features that you can use</h3>
                     <ul>
@@ -140,12 +165,6 @@
                     </ul>
                   </section>
                   <section>
-                    <h3>Ansible Collaborating with OpenStack via Zuul</h3>
-                    PR's to Ansible's OpenStack modules are tested via Zuul
-                    <img src="images/ansible-github.png"/>
-                    <a href="https://github.com/ansible/ansible/pull/37170">https://github.com/ansible/ansible/pull/37170</a>
-                  </section>
-                  <section>
                     <h3>YAML config in-repo or centralized defines config</h3>
                     <pre><code class="yaml data-trim">
 - project:
@@ -160,18 +179,6 @@
               - ^lib/ansible/module_utils/openstack.py
               - ^lib/ansible/utils/module_docs_fragments/openstack.py
                     </code></pre>
-                  </section>
-                  <section><h3>Speculative merging for high velocity merging</h3>
-                    [ switch to other presentation ]
-                  </section>
-                  <section><h3>Custom Image Building/Multi-Cloud</h3>
-                    <ul>
-                      <li>Pre-cache all those downloads</li>
-                      <li>Nodepool manages image uploads and refreshes periodically</li>
-                      <li>Uses diskimage-builder -- whole other talk</li>
-                      <li>Multi-Cloud -- as long as they're all OpenStack clouds (over 20 public OpenStacks globally)</li>
-                      <li>AWS, Kubernetes, and other resource drivers are available but un-merged</li>
-                    </ul>
                   </section>
                   <section><h3>Easy Multi-Node testing</h3>
                     <pre><code class="yaml" data-trim>
@@ -211,16 +218,54 @@
     - mq
 </pre></code>
                   </section>
-                  <section><h3>Massively Scalable</h3>
-                    <img src="images/zuul-arch.svg" height="60%"/>
+                  <section>
+                    <img src="images/zuul-arch.svg" height="35%"/>
                   </section>
                   <section><h3>Cross-Repo Dependency Controls</h3>
 					<ul>
                       <li>Make one change depend on another</li>
-                      <li>Build speculative cross-repo change-set <b>and test it without merging it</b></li>
+                      <li>Build speculative cross-repo change-set <b>and test the changes together without merging them</b></li>
                       <li>Allows devs to "fire and forget" on a PR, it won't merge until it will actually work!</li>
                       <li>Struggles with circular deps, you must unroll to use the feature</li>
 			        </ul>	
+                  </section>
+                </section>
+                <section>
+                  <section>But how does GoDaddy use it?</section>
+                  <section>
+                    <ul>
+                      <li>Strive to express every change as a git commit</li>
+                      <li>Only deploy changes that have at least been throug a Zuul test</li>
+                      <li>Define jobs that test the components in isolation and end-to-end</li>
+                      <li>Ask forgiveness, not permission...</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h3>GoDaddy has some synergy with Zuul that helps too</h3>
+                    <ul>
+                      <li>GitHub Enterprise for change tracking already in place</li>
+                      <li>Over 2000 hypervisors worth of OpenStack private cloud spread across 4 regions</li>
+                      <li>OpenStack Engineering (AKA Cloud Automation) team at GoDaddy already was transitioning to Ansible</li>
+                      <li>Helps to have a Zuul core dev on staff</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h3>Ok but, what is it, that you do here?</h3>
+                    <ul>
+                      <li>95% of changes are expressed as changes to 1 repo, as 1 of 3 things: Config, Topology, or rendering of Config+Topology</li>
+                      <li>Topology is the model by which we relate services, servers, and configuration</li>
+                      <li>Zuul job creates a "fake" topology with the nodeset given, and renders it in to the needed Ansible inventory and variables for every job run</li>
+                      <li>Each job is given access to a limited service account that lets it talk to services outside of OpenStack team's control</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h3>No problems, everything is fine</h3>
+                    <ul>
+                      <li>Deploying a mini-cloud on 5 VMs and running a slew of functional tests on it is slow - 55 minutes</li>
+                      <li>When Zuul breaks, team isn't invested enough to fix it</li>
+                      <li>Zuul's scale makes deployment complicated</li>
+                      <li>Auto-Hold system is clunky for users, as it was designed with Zuul-admins in mind</li>
+                    </ul>
                   </section>
                 </section>
 				<section>
